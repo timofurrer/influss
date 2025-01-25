@@ -1,6 +1,7 @@
 package main
 
 import (
+	"cmp"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -22,6 +23,8 @@ type Clip struct {
 	URL         string
 	Title       string
 	Author      string
+	PublishedAt time.Time
+	ModifiedAt  time.Time
 	Excerpt     string
 	HTMLContent string
 	Tags        []string
@@ -94,12 +97,9 @@ func clipHandlerFunc(store Store) http.HandlerFunc {
 					Link: &feeds.Link{
 						Href: c.URL,
 					},
-					// Source:      &feeds.Link{
-					// 	Href:   "",
-					// 	Rel:    "",
-					// 	Type:   "",
-					// 	Length: "",
-					// },
+					Source: &feeds.Link{
+						Href: c.URL,
+					},
 					Author: &feeds.Author{
 						Name: c.Author,
 						// Email: "",
@@ -107,8 +107,8 @@ func clipHandlerFunc(store Store) http.HandlerFunc {
 					Description: c.Excerpt,
 					// Id:          "",
 					// IsPermaLink: "",
-					// Updated:     time.Time{},
-					// Created:     time.Time{},
+					Updated: c.ModifiedAt,
+					Created: c.PublishedAt,
 					// Enclosure:   &feeds.Enclosure{},
 					Content: c.HTMLContent,
 				}
@@ -137,10 +137,13 @@ func clip(store Store, req clipRequest) error {
 		return fmt.Errorf("failed to get article: %w", err)
 	}
 
+	now := time.Now()
 	clip := &Clip{
 		URL:         req.URL,
 		Title:       article.Title,
 		Author:      article.Byline,
+		PublishedAt: *cmp.Or(article.PublishedTime, &now),
+		ModifiedAt:  *cmp.Or(article.ModifiedTime, &now),
 		Excerpt:     article.Excerpt,
 		HTMLContent: article.Content,
 		Tags:        req.Tags,

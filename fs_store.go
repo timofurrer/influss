@@ -10,12 +10,14 @@ import (
 	"os"
 	"path/filepath"
 	"slices"
+	"sync"
 	"time"
 )
 
 type FSStore struct {
 	dir   string
 	index *index
+	m     sync.RWMutex
 }
 
 type index struct {
@@ -30,12 +32,14 @@ type clipMeta struct {
 }
 
 type fsClip struct {
-	URL         string   `json:"url"`
-	Title       string   `json:"title"`
-	Author      string   `json:"author"`
-	Excerpt     string   `json:"excerpt"`
-	HTMLContent string   `json:"html_content"`
-	Tags        []string `json:"tags"`
+	URL         string    `json:"url"`
+	Title       string    `json:"title"`
+	PublishedAt time.Time `json:"published_at"`
+	ModifiedAt  time.Time `json:"modified_at"`
+	Author      string    `json:"author"`
+	Excerpt     string    `json:"excerpt"`
+	HTMLContent string    `json:"html_content"`
+	Tags        []string  `json:"tags"`
 }
 
 func NewFSStore(dir string) (*FSStore, error) {
@@ -60,10 +64,14 @@ func NewFSStore(dir string) (*FSStore, error) {
 }
 
 func (s *FSStore) Store(clip *Clip) error {
+	s.m.Lock()
+	defer s.m.Unlock()
 	fc := fsClip{
 		URL:         clip.URL,
 		Title:       clip.Title,
 		Author:      clip.Author,
+		PublishedAt: clip.PublishedAt,
+		ModifiedAt:  clip.ModifiedAt,
 		Excerpt:     clip.Excerpt,
 		HTMLContent: clip.HTMLContent,
 		Tags:        clip.Tags,
@@ -86,6 +94,8 @@ func (s *FSStore) Store(clip *Clip) error {
 }
 
 func (s *FSStore) Load(lastN int) []*Clip {
+	s.m.RLock()
+	s.m.RUnlock()
 	log := slog.Default()
 	cs := slices.Collect(maps.Values(s.index.Clips))
 	slices.SortFunc(cs, func(a, b clipMeta) int {
@@ -111,6 +121,8 @@ func (s *FSStore) Load(lastN int) []*Clip {
 			URL:         c.URL,
 			Title:       c.Title,
 			Author:      c.Author,
+			PublishedAt: c.PublishedAt,
+			ModifiedAt:  c.ModifiedAt,
 			Excerpt:     c.Excerpt,
 			HTMLContent: c.HTMLContent,
 			Tags:        c.Tags,
