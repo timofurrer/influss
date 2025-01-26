@@ -14,14 +14,11 @@
     "web-ext": "^8.3.0"
   },
   "webExt": {
-    "version": {
-      "license": ["MIT"]
-    },
     "build": {
       "overwriteDest": true
     },
     "sign": {
-      "channel": "listed"
+      "channel": "unlisted"
     }
   }
 }
