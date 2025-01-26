@@ -1,0 +1,37 @@
+name: Publish Firefox Add-on
+on:
+  push:
+    tags:
+      - 'v*'
+    paths:
+      - 'extensions/**'
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: extensions
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install web-ext
+        run: npm install --global web-ext
+
+      - name: Build add-on
+        run: |
+          web-ext build --overwrite-dest --source-dir ./
+          mv web-ext-artifacts/*.zip web-ext-artifacts/addon.zip
+
+      - name: Sign and publish add-on
+        env:
+          WEB_EXT_API_KEY: ${{ secrets.AMO_JWT_ISSUER }}
+          WEB_EXT_API_SECRET: ${{ secrets.AMO_JWT_SECRET }}
+        run: |
+          web-ext sign --api-key=$WEB_EXT_API_KEY --api-secret=$WEB_EXT_API_SECRET --channel=listed --source-dir ./
