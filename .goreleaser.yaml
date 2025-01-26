@@ -23,16 +23,22 @@ archives:
   - format: tar.gz
 
 dockers:
-  - use: buildx
-    platforms:
-      - linux/amd64
-      - linux/arm64
-    image_templates:
-      - "ghcr.io/{{ .Env.GITHUB_REPOSITORY }}/influss:{{ .Version }}"
-      - "ghcr.io/{{ .Env.GITHUB_REPOSITORY }}/influss:latest"
-    dockerfile: Dockerfile
+  - image_templates:
+      - "ghcr.io/{{ .Env.GITHUB_REPOSITORY }}/influss:{{ .Version }}-amd64"
+    use: buildx
     build_flag_templates:
-      - "--label=org.opencontainers.image.created={{.Date}}"
-      - "--label=org.opencontainers.image.title={{.ProjectName}}"
-      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
-      - "--label=org.opencontainers.image.version={{.Version}}"
+      - "--pull"
+      - "--platform=linux/amd64"
+  - image_templates:
+      - "ghcr.io/{{ .Env.GITHUB_REPOSITORY }}/influss:{{ .Version }}-arm64"
+    use: buildx
+    build_flag_templates:
+      - "--pull"
+      - "--platform=linux/arm64"
+    goarch: arm64
+
+docker_manifests:
+  - name_template: "ghcr.io/{{ .Env.GITHUB_REPOSITORY }}/influss:{{ .Version }}"
+    image_templates:
+      - "ghcr.io/{{ .Env.GITHUB_REPOSITORY }}/influss:{{ .Version }}-amd64"
+      - "ghcr.io/{{ .Env.GITHUB_REPOSITORY }}/influss:{{ .Version }}-arm64"
