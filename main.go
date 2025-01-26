@@ -159,7 +159,9 @@ func main() {
 	}))
 	slog.SetDefault(log)
 
-	store, err := NewFSStore("store")
+	storeDir := cmp.Or(os.Getenv("INFLUSS_STORE_DIR"), "store")
+
+	store, err := NewFSStore(storeDir)
 	if err != nil {
 		log.Error("failed to create store", slog.String("error", err.Error()))
 		return

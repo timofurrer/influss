@@ -13,10 +13,35 @@
       "id": "{f2313271-d6ed-4843-8157-00b56c01f40a}"
     }
   },
+
+  "browser_action": {
+    "default_icon": {
+      "48": "icons/clip-48.png",
+      "96": "icons/clip-96.png"
+    },
+    "default_title": "Clip Website",
+    "default_popup": "popup.html"
+  },
+
+  "page_action": {
+    "default_icon": {
+      "48": "icons/clip-48.png",
+      "96": "icons/clip-96.png"
+    },
+    "default_title": "Clip Website",
+    "show_matches": ["<all_urls>"]
+  },
+
   "background": {
     "scripts": ["background.js"]
   },
+
   "options_ui": {
     "page": "options.html"
+  },
+
+  "icons": {
+    "48": "icons/clip-48.png",
+    "96": "icons/clip-96.png"
   }
 }

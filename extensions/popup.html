@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      width: 300px;
+      padding: 16px;
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      margin: 8px 0;
+      border: none;
+      border-radius: 4px;
+      background: #0060df;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #003eaa;
+    }
+    .settings-link {
+      display: block;
+      margin-top: 16px;
+      text-align: center;
+      color: #0060df;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <button id="clip-button">Clip Current Page</button>
+  <a href="#" id="settings-link" class="settings-link">Settings</a>
+  <script src="popup.js"></script>
+</body>
+</html>
