@@ -12,5 +12,13 @@
   },
   "devDependencies": {
     "web-ext": "^8.3.0"
+  },
+  "webExt": {
+    "build": {
+      "overwriteDest": true
+    },
+    "sign": {
+      "channel": "listed"
+    }
   }
 }
