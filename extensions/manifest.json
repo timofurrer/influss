@@ -8,6 +8,11 @@
     "storage",
     "<all_urls>"
   ],
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "{f2313271-d6ed-4843-8157-00b56c01f40a}"
+    }
+  },
   "background": {
     "scripts": ["background.js"]
   },
