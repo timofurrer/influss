@@ -31,8 +31,6 @@ jobs:
           VERSION=${GITHUB_REF#refs/tags/v}
           # Update version in manifest.json
           jq ".version = \"$VERSION\"" manifest.json > manifest.json.tmp && mv manifest.json.tmp manifest.json
-          # Update version in amo-config.json
-          jq ".version = \"$VERSION\"" amo-config.json > amo-config.json.tmp && mv amo-config.json.tmp amo-config.json
           # Update version in package.json
           jq ".version = \"$VERSION\"" package.json > package.json.tmp && mv package.json.tmp package.json
 
