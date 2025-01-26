@@ -18,7 +18,8 @@
       "overwriteDest": true
     },
     "sign": {
-      "channel": "unlisted"
+      "channel": "listed",
+      "amoMetadata": "./amo-config.json"
     }
   }
 }

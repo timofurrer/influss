@@ -1,0 +1,18 @@
+{
+  "id": "{f2313271-d6ed-4843-8157-00b56c01f40a}",
+  "version": "1.0.0",
+  "license": "MIT",
+  "categories": ["productivity"],
+  "homepage": "https://github.com/timofurrer/influss",
+  "summary": "Minimalist website clipper to be consumed by your favorite RSS reader",
+  "descriptions": {
+    "en": "Minimalist website clipper to be consumed by your favorite RSS reader."
+  },
+  "default_locale": "en",
+  "release_notes": {
+    "en": "Initial release"
+  },
+  "platforms": ["all"],
+  "tags": ["productivity", "bookmarking", "clipping"],
+  "review_type": "automated"
+}

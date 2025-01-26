@@ -20,14 +20,25 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: extensions/package-lock.json
 
-      - name: Install web-ext
-        run: npm install --global web-ext
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Update version in configs
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/v}
+          # Update version in manifest.json
+          jq ".version = \"$VERSION\"" manifest.json > manifest.json.tmp && mv manifest.json.tmp manifest.json
+          # Update version in amo-config.json
+          jq ".version = \"$VERSION\"" amo-config.json > amo-config.json.tmp && mv amo-config.json.tmp amo-config.json
+          # Update version in package.json
+          jq ".version = \"$VERSION\"" package.json > package.json.tmp && mv package.json.tmp package.json
 
       - name: Build add-on
         run: |
-          web-ext build --overwrite-dest --source-dir ./
-          mv web-ext-artifacts/*.zip web-ext-artifacts/addon.zip
+          npm run build
 
       - name: Sign and publish add-on
         env:
@@ -35,3 +46,4 @@ jobs:
           WEB_EXT_API_SECRET: ${{ secrets.AMO_JWT_SECRET }}
         run: |
           web-ext sign --api-key=$WEB_EXT_API_KEY --api-secret=$WEB_EXT_API_SECRET --source-dir ./
+          npm run sign
