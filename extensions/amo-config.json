@@ -2,6 +2,10 @@
   "summary": {
     "en-US": "Minimalist website clipper to be consumed by your favorite RSS reader."
   },
+  "categories": [
+    "bookmarks",
+    "other"
+  ],
   "version": {
     "license": "MIT"
   }
