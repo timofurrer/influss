@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Influss Clipper",
-  "version": "1.0",
+  "version": "1.0.0",
   "description": "Minimalist website clipper to be consumed by your favorite RSS reader.",
   "permissions": [
     "contextMenus",

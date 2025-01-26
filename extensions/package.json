@@ -1,0 +1,16 @@
+{
+  "name": "influss-clipper",
+  "version": "1.0.0",
+  "license": "MIT",
+  "description": "Minimalist website clipper to be consumed by your favorite RSS reader.",
+  "scripts": {
+    "build": "web-ext build",
+    "start": "web-ext run",
+    "lint": "web-ext lint",
+    "sign": "web-ext sign",
+    "watch": "web-ext run --watch-files"
+  },
+  "devDependencies": {
+    "web-ext": "^8.3.0"
+  }
+}
