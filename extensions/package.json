@@ -2,6 +2,7 @@
   "name": "influss-clipper",
   "version": "1.0.0",
   "license": "MIT",
+  "private": true,
   "description": "Minimalist website clipper to be consumed by your favorite RSS reader.",
   "scripts": {
     "build": "web-ext build",

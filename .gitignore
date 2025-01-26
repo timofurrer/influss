@@ -25,3 +25,5 @@ go.work.sum
 .env
 
 store/
+
+node_modules/
