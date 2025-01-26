@@ -22,7 +22,7 @@ jobs:
           node-version: '18'
 
       - name: Install web-ext
-        run: npm install
+        run: npm install --global
 
       - name: Build add-on
         run: |
