@@ -18,23 +18,14 @@ browser.storage.onChanged.addListener((changes, area) => {
   }
 });
 
-// Handle browser action clicks
-browser.browserAction.onClicked.addListener(async (tab) => {
-  await clipWebsite(tab.url);
-});
-
-// Handle page action clicks
-browser.pageAction.onClicked.addListener(async (tab) => {
+// Handle action clicks
+browser.action.onClicked.addListener(async (tab) => {
   await clipWebsite(tab.url);
 });
 
 async function clipWebsite(url) {
   if (!endpoint) {
-    browser.notifications.create({
-      type: 'basic',
-      title: 'Influss Clipper',
-      message: 'Please configure the endpoint in the extension settings first.'
-    });
+    console.error('Endpoint not configured');
     return;
   }
 
@@ -52,18 +43,16 @@ async function clipWebsite(url) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    // Show success notification
-    browser.notifications.create({
-      type: 'basic',
-      title: 'Influss Clipper',
-      message: 'Successfully clipped website!'
-    });
+    // Android doesn't support notifications API, so we use console.log
+    console.log('Successfully clipped website!');
   } catch (error) {
     console.error('Error clipping website:', error);
-    browser.notifications.create({
-      type: 'basic',
-      title: 'Influss Clipper',
-      message: 'Error clipping website: ' + error.message
-    });
   }
 }
+
+// Listen for messages from popup
+browser.runtime.onMessage.addListener(async (message) => {
+  if (message.action === 'clipWebsite') {
+    await clipWebsite(message.url);
+  }
+});
