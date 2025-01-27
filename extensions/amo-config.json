@@ -1,5 +1,7 @@
 {
-  "name": "Influss Clipper",
+  "name": {
+    "en-US": "Influss Clipper"
+  },
   "version": {
     "license": "MIT"
   },
@@ -13,7 +15,9 @@
     "bookmarks"
   ],
   "homepage": {
-    "url": "https://github.com/timofurrer/influss"
+    "en-US": {
+      "url": "https://github.com/timofurrer/influss"
+    }
   },
   "is_experimental": true
 }
