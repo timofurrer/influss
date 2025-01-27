@@ -99,7 +99,7 @@ func (s *FSStore) Load(lastN int) []*Clip {
 	log := slog.Default()
 	cs := slices.Collect(maps.Values(s.index.Clips))
 	slices.SortFunc(cs, func(a, b clipMeta) int {
-		return a.Timestamp.Compare(b.Timestamp)
+		return b.Timestamp.Compare(a.Timestamp)
 	})
 
 	cs = cs[:min(lastN, len(cs))]
