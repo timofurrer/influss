@@ -18,6 +18,13 @@ browser.storage.onChanged.addListener((changes, area) => {
   }
 });
 
+// Create context menu item
+browser.contextMenus.create({
+  id: "clip-website",
+  title: "Read it later with Influss",
+  contexts: ["page", "link"]
+});
+
 // Handle action clicks
 browser.action.onClicked.addListener(async (tab) => {
   await clipWebsite(tab.url);
@@ -49,6 +56,15 @@ async function clipWebsite(url) {
     console.error('Error clipping website:', error);
   }
 }
+
+// Handle context menu clicks
+browser.contextMenus.onClicked.addListener(async (info, tab) => {
+  if (info.menuItemId === "clip-website") {
+    // If it's a link that was right-clicked, use that URL
+    const urlToClip = info.linkUrl || tab.url;
+    await clipWebsite(urlToClip);
+  }
+});
 
 // Listen for messages from popup
 browser.runtime.onMessage.addListener(async (message) => {
