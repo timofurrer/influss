@@ -17,7 +17,6 @@ import (
 
 type clipRequest struct {
 	URL  string   `json:"url"`
-	Tags []string `json:"tags"`
 }
 
 type Clip struct {
@@ -28,7 +27,6 @@ type Clip struct {
 	ModifiedAt  time.Time
 	Excerpt     string
 	HTMLContent string
-	Tags        []string
 }
 
 type Store interface {
@@ -44,14 +42,11 @@ type config struct {
 	feedDescription string
 	feedAuthorName  string
 	feedAuthorEmail string
+	feedCategory    string
 }
 
 func URLField(url string) slog.Attr {
 	return slog.String("url", url)
-}
-
-func TagsField(tags []string) slog.Attr {
-	return slog.Any("tags", tags)
 }
 
 func clipHandlerFunc(config config, store Store) http.HandlerFunc {
@@ -74,7 +69,7 @@ func clipHandlerFunc(config config, store Store) http.HandlerFunc {
 				return
 			}
 
-			log.Info("Received request to clip URL", URLField(req.URL), TagsField(req.Tags))
+			log.Info("Received request to clip URL", URLField(req.URL))
 
 			err = clip(store, req)
 			if err != nil {
@@ -86,55 +81,43 @@ func clipHandlerFunc(config config, store Store) http.HandlerFunc {
 		case http.MethodGet:
 			clips := store.Load(20)
 
-			feed := &feeds.Feed{
-				Title: config.feedTitle,
-				Link: &feeds.Link{
-					Href: config.feedLink,
-				},
-				Description: config.feedDescription,
-				Author: &feeds.Author{
-					Name:  config.feedAuthorName,
-					Email: config.feedAuthorEmail,
-				},
-				Updated: store.LastUpdatedAt(),
-				Created: store.CreatedAt(),
-				// Id:          "",
-				// Subtitle:    "",
-				Copyright: fmt.Sprintf("Influss and %s", config.feedAuthorName),
-				// Image:       &feeds.Image{},
+			feed := &feeds.RssFeed{
+				Title:          config.feedTitle,
+				Link:           config.feedLink,
+				Description:    config.feedDescription,
+				ManagingEditor: fmt.Sprintf("%s (%s)", config.feedAuthorName, config.feedAuthorEmail),
+				LastBuildDate:  store.LastUpdatedAt().Format(time.RFC1123Z),
+				PubDate:        store.CreatedAt().Format(time.RFC1123Z),
+				Category:       config.feedCategory,
+				Copyright:      fmt.Sprintf("Influss and %s", config.feedAuthorName),
 			}
 			for _, c := range clips {
-				item := &feeds.Item{
+				item := &feeds.RssItem{
+					Guid: &feeds.RssGuid{
+						Id:          c.URL,
+						IsPermaLink: "true",
+					},
 					Title: c.Title,
-					Link: &feeds.Link{
-						Href: c.URL,
-					},
-					Source: &feeds.Link{
-						Href: c.URL,
-					},
-					Author: &feeds.Author{
-						Name: c.Author,
-					},
+					Link: c.URL,
+					Source: c.URL,
+					Author: c.Author,
 					Description: c.Excerpt,
-					// Id:          "",
-					// IsPermaLink: "",
-					Updated: c.ModifiedAt,
-					Created: c.PublishedAt,
-					// Enclosure:   &feeds.Enclosure{},
-					Content: c.HTMLContent,
+					PubDate: c.ModifiedAt.Format(time.RFC1123Z),
+					Content: &feeds.RssContent{
+						Content: c.HTMLContent,
+					},
 				}
 				feed.Items = append(feed.Items, item)
 			}
 
-			rss, err := feed.ToRss()
+			data, err := feeds.ToXML(feed)
 			if err != nil {
 				http.Error(w, fmt.Sprintf("Failed to generate RSS: %s", err), http.StatusInternalServerError)
 				return
 			}
 
 			w.WriteHeader(http.StatusOK)
-			w.Write([]byte(rss))
-			return
+			w.Write([]byte(data))
 		default:
 			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 			return
@@ -157,7 +140,6 @@ func clip(store Store, req clipRequest) error {
 		ModifiedAt:  *cmp.Or(article.ModifiedTime, &now),
 		Excerpt:     article.Excerpt,
 		HTMLContent: article.Content,
-		Tags:        req.Tags,
 	}
 	store.Store(clip)
 
@@ -176,6 +158,7 @@ func main() {
 	flag.StringVar(&config.feedDescription, "feed-description", "Influss Feed", "the description of the RSS feed")
 	flag.StringVar(&config.feedAuthorName, "feed-author-name", "", "the RSS feed author name (your name probably)")
 	flag.StringVar(&config.feedAuthorEmail, "feed-author-email", "", "the RSS feed author email (your email probably)")
+	flag.StringVar(&config.feedCategory, "feed-category", "Read It Later", "the RSS feed category")
 
 	flag.Parse()
 

@@ -40,7 +40,6 @@ type fsClip struct {
 	Author      string    `json:"author"`
 	Excerpt     string    `json:"excerpt"`
 	HTMLContent string    `json:"html_content"`
-	Tags        []string  `json:"tags"`
 }
 
 func NewFSStore(dir string) (*FSStore, error) {
@@ -87,7 +86,6 @@ func (s *FSStore) Store(clip *Clip) error {
 		ModifiedAt:  clip.ModifiedAt,
 		Excerpt:     clip.Excerpt,
 		HTMLContent: clip.HTMLContent,
-		Tags:        clip.Tags,
 	}
 
 	h := generateClipHash(clip)
@@ -138,7 +136,6 @@ func (s *FSStore) Load(lastN int) []*Clip {
 			ModifiedAt:  c.ModifiedAt,
 			Excerpt:     c.Excerpt,
 			HTMLContent: c.HTMLContent,
-			Tags:        c.Tags,
 		})
 	}
 	return clips
