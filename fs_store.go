@@ -67,10 +67,6 @@ func NewFSStore(dir string) (*FSStore, error) {
 	}, nil
 }
 
-func (s *FSStore) LastUpdatedAt() time.Time {
-	return s.index.LastUpdatedAt
-}
-
 func (s *FSStore) CreatedAt() time.Time {
 	return s.index.CreatedAt
 }

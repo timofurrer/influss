@@ -2,21 +2,18 @@ package main
 
 import (
 	"cmp"
-	"encoding/json"
 	"flag"
 	"fmt"
-	"io"
 	"log/slog"
 	"net/http"
 	"os"
 	"time"
 
 	"github.com/go-shiori/go-readability"
-	"github.com/gorilla/feeds"
 )
 
 type clipRequest struct {
-	URL  string   `json:"url"`
+	URL string `json:"url"`
 }
 
 type Clip struct {
@@ -33,7 +30,6 @@ type Store interface {
 	Store(clip *Clip) error
 	Load(lastN int) []*Clip
 	CreatedAt() time.Time
-	LastUpdatedAt() time.Time
 }
 
 type config struct {
@@ -43,86 +39,6 @@ type config struct {
 	feedAuthorName  string
 	feedAuthorEmail string
 	feedCategory    string
-}
-
-func URLField(url string) slog.Attr {
-	return slog.String("url", url)
-}
-
-func clipHandlerFunc(config config, store Store) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		log := slog.Default()
-
-		switch r.Method {
-		case http.MethodPost:
-			body, err := io.ReadAll(r.Body)
-			if err != nil {
-				http.Error(w, fmt.Sprintf("Error reading request body: %s", err), http.StatusBadRequest)
-				return
-			}
-			defer r.Body.Close()
-
-			req := clipRequest{}
-			err = json.Unmarshal(body, &req)
-			if err != nil {
-				http.Error(w, fmt.Sprintf("Error parsing request body: %s", err), http.StatusBadRequest)
-				return
-			}
-
-			log.Info("Received request to clip URL", URLField(req.URL))
-
-			err = clip(store, req)
-			if err != nil {
-				http.Error(w, fmt.Sprintf("Error clipping URL: %s", err), http.StatusInternalServerError)
-				return
-			}
-
-			w.WriteHeader(http.StatusCreated)
-		case http.MethodGet:
-			clips := store.Load(20)
-
-			feed := &feeds.RssFeed{
-				Title:          config.feedTitle,
-				Link:           config.feedLink,
-				Description:    config.feedDescription,
-				ManagingEditor: fmt.Sprintf("%s (%s)", config.feedAuthorName, config.feedAuthorEmail),
-				LastBuildDate:  store.LastUpdatedAt().Format(time.RFC1123Z),
-				PubDate:        store.CreatedAt().Format(time.RFC1123Z),
-				Category:       config.feedCategory,
-				Copyright:      fmt.Sprintf("Influss and %s", config.feedAuthorName),
-			}
-			for _, c := range clips {
-				item := &feeds.RssItem{
-					Guid: &feeds.RssGuid{
-						Id:          c.URL,
-						IsPermaLink: "true",
-					},
-					Title: c.Title,
-					Link: c.URL,
-					Source: c.URL,
-					Author: c.Author,
-					Description: c.Excerpt,
-					PubDate: c.ModifiedAt.Format(time.RFC1123Z),
-					Content: &feeds.RssContent{
-						Content: c.HTMLContent,
-					},
-				}
-				feed.Items = append(feed.Items, item)
-			}
-
-			data, err := feeds.ToXML(feed)
-			if err != nil {
-				http.Error(w, fmt.Sprintf("Failed to generate RSS: %s", err), http.StatusInternalServerError)
-				return
-			}
-
-			w.WriteHeader(http.StatusOK)
-			w.Write([]byte(data))
-		default:
-			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-			return
-		}
-	}
 }
 
 func clip(store Store, req clipRequest) error {
