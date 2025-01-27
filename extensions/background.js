@@ -138,4 +138,4 @@ browser.runtime.onMessage.addListener(async (message) => {
   if (message.action === 'clipWebsite') {
     await clipWebsite(message.url);
   }
-});``
+});

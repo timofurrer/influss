@@ -9,7 +9,9 @@ document.getElementById('clip-button').addEventListener('click', async () => {
   });
 
   // Close popup
-  window.close();
+  setTimeout(() => {
+    window.close();
+  }, 3000);
 });
 
 document.getElementById('settings-link').addEventListener('click', (e) => {
