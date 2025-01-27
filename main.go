@@ -3,6 +3,7 @@ package main
 import (
 	"cmp"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"io"
 	"log/slog"
@@ -33,6 +34,14 @@ type Clip struct {
 type Store interface {
 	Store(clip *Clip) error
 	Load(lastN int) []*Clip
+	CreatedAt() time.Time
+	LastUpdatedAt() time.Time
+}
+
+type config struct {
+	feedTitle       string
+	feedLink        string
+	feedDescription string
 }
 
 func URLField(url string) slog.Attr {
@@ -43,7 +52,7 @@ func TagsField(tags []string) slog.Attr {
 	return slog.Any("tags", tags)
 }
 
-func clipHandlerFunc(store Store) http.HandlerFunc {
+func clipHandlerFunc(config config, store Store) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		log := slog.Default()
 
@@ -76,15 +85,17 @@ func clipHandlerFunc(store Store) http.HandlerFunc {
 			clips := store.Load(20)
 
 			feed := &feeds.Feed{
-				Title:       "Influss",
-				Link:        &feeds.Link{},
-				Description: "Influss Feed",
+				Title: config.feedTitle,
+				Link: &feeds.Link{
+					Href: config.feedLink,
+				},
+				Description: config.feedDescription,
 				Author: &feeds.Author{
 					Name:  "Timo Furrer",
 					Email: "timo@furrer.life",
 				},
-				Updated: time.Now(),
-				Created: time.Now(),
+				Updated: store.LastUpdatedAt(),
+				Created: store.CreatedAt(),
 				// Id:          "",
 				// Subtitle:    "",
 				// Items:       []*feeds.Item{},
@@ -159,6 +170,13 @@ func main() {
 	}))
 	slog.SetDefault(log)
 
+	config := config{}
+	flag.StringVar(&config.feedTitle, "feed-title", "Influss", "the RSS feed title")
+	flag.StringVar(&config.feedLink, "feed-link", "", "the external URL to the RSS feed")
+	flag.StringVar(&config.feedDescription, "feed-description", "Influss Feed", "the description of the RSS feed")
+
+	flag.Parse()
+
 	storeDir := cmp.Or(os.Getenv("INFLUSS_STORE_DIR"), "store")
 
 	store, err := NewFSStore(storeDir)
@@ -167,7 +185,7 @@ func main() {
 		return
 	}
 
-	http.HandleFunc("/clips", clipHandlerFunc(store))
+	http.HandleFunc("/clips", clipHandlerFunc(config, store))
 
 	port := ":8080"
 	log.Info("Serving ...", slog.String("port", port))

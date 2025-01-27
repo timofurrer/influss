@@ -21,6 +21,7 @@ type FSStore struct {
 }
 
 type index struct {
+	CreatedAt     time.Time           `json:"created_at"`
 	LastUpdatedAt time.Time           `json:"last_updated_at"`
 	Clips         map[string]clipMeta `json:"clips"`
 }
@@ -48,7 +49,11 @@ func NewFSStore(dir string) (*FSStore, error) {
 	if err != nil {
 		return &FSStore{
 			dir:   dir,
-			index: &index{LastUpdatedAt: time.Now(), Clips: make(map[string]clipMeta)},
+			index: &index{
+				CreatedAt: time.Now(),
+				LastUpdatedAt: time.Now(),
+				Clips: make(map[string]clipMeta),
+			},
 		}, nil
 	}
 	index := &index{}
@@ -61,6 +66,14 @@ func NewFSStore(dir string) (*FSStore, error) {
 		dir:   dir,
 		index: index,
 	}, nil
+}
+
+func (s *FSStore) LastUpdatedAt() time.Time {
+	return s.index.LastUpdatedAt
+}
+
+func (s *FSStore) CreatedAt() time.Time {
+	return s.index.CreatedAt
 }
 
 func (s *FSStore) Store(clip *Clip) error {
