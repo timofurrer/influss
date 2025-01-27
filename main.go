@@ -42,6 +42,8 @@ type config struct {
 	feedTitle       string
 	feedLink        string
 	feedDescription string
+	feedAuthorName  string
+	feedAuthorEmail string
 }
 
 func URLField(url string) slog.Attr {
@@ -91,15 +93,14 @@ func clipHandlerFunc(config config, store Store) http.HandlerFunc {
 				},
 				Description: config.feedDescription,
 				Author: &feeds.Author{
-					Name:  "Timo Furrer",
-					Email: "timo@furrer.life",
+					Name:  config.feedAuthorName,
+					Email: config.feedAuthorEmail,
 				},
 				Updated: store.LastUpdatedAt(),
 				Created: store.CreatedAt(),
 				// Id:          "",
 				// Subtitle:    "",
-				// Items:       []*feeds.Item{},
-				// Copyright:   "",
+				Copyright: fmt.Sprintf("Influss and %s", config.feedAuthorName),
 				// Image:       &feeds.Image{},
 			}
 			for _, c := range clips {
@@ -113,7 +114,6 @@ func clipHandlerFunc(config config, store Store) http.HandlerFunc {
 					},
 					Author: &feeds.Author{
 						Name: c.Author,
-						// Email: "",
 					},
 					Description: c.Excerpt,
 					// Id:          "",
@@ -174,6 +174,8 @@ func main() {
 	flag.StringVar(&config.feedTitle, "feed-title", "Influss", "the RSS feed title")
 	flag.StringVar(&config.feedLink, "feed-link", "", "the external URL to the RSS feed")
 	flag.StringVar(&config.feedDescription, "feed-description", "Influss Feed", "the description of the RSS feed")
+	flag.StringVar(&config.feedAuthorName, "feed-author-name", "", "the RSS feed author name (your name probably)")
+	flag.StringVar(&config.feedAuthorEmail, "feed-author-email", "", "the RSS feed author email (your email probably)")
 
 	flag.Parse()
 
