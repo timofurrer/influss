@@ -58,61 +58,70 @@ async function clipWebsite(url) {
 
 // Create a reusable notification system
 async function showToastNotification(result) {
-  // Inject CSS
-  await browser.tabs.insertCSS({
-    code: `
-      .influss-notification {
-        position: fixed;
-        top: 16px;
-        right: 16px;
-        padding: 12px 16px;
-        border-radius: 8px;
-        font-family: system-ui, -apple-system, sans-serif;
-        font-size: 14px;
-        max-width: 300px;
-        z-index: 2147483647;
-        animation: influssSlideIn 0.3s ease-out, influssSlideOut 0.3s ease-in 2.7s;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-      }
+  try {
+    // Get the active tab
+    const tabs = await browser.tabs.query({ active: true, currentWindow: true });
+    const activeTab = tabs[0];
 
-      .influss-notification.success {
-        background-color: #4ade80;
-        color: #052e16;
-      }
+    // Inject the notification CSS
+    await browser.scripting.insertCSS({
+      target: { tabId: activeTab.id },
+      css: `
+        .influss-toast {
+          position: fixed;
+          top: 20px;
+          right: 20px;
+          background: ${result.success ? '#10B981' : '#EF4444'};
+          color: white;
+          padding: 12px 20px;
+          border-radius: 8px;
+          font-family: system-ui, -apple-system, sans-serif;
+          font-size: 14px;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+          z-index: 2147483647;
+          max-width: 300px;
+          opacity: 0;
+          transform: translateY(-20px);
+          transition: all 0.3s ease-in-out;
+        }
+        .influss-toast.show {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      `
+    });
 
-      .influss-notification.error {
-        background-color: #f87171;
-        color: #450a0a;
-      }
+    // Inject the notification script
+    await browser.scripting.executeScript({
+      target: { tabId: activeTab.id },
+      func: (message) => {
+        // Remove any existing toast
+        const existingToast = document.querySelector('.influss-toast');
+        if (existingToast) {
+          existingToast.remove();
+        }
 
-      @keyframes influssSlideIn {
-        from { transform: translateX(100%); opacity: 0; }
-        to { transform: translateX(0); opacity: 1; }
-      }
+        // Create new toast
+        const toast = document.createElement('div');
+        toast.className = 'influss-toast';
+        toast.textContent = message;
+        document.body.appendChild(toast);
 
-      @keyframes influssSlideOut {
-        from { transform: translateX(0); opacity: 1; }
-        to { transform: translateX(100%); opacity: 0; }
-      }
-    `
-  });
+        // Trigger animation
+        setTimeout(() => toast.classList.add('show'), 10);
 
-  // Inject and remove notification
-  await browser.tabs.executeScript({
-    code: `
-      (function() {
-        const notification = document.createElement('div');
-        notification.className = 'influss-notification ' + '${result.success ? 'success' : 'error'}';
-        notification.textContent = '${result.message.replace(/'/g, "\\'")}';
-        document.body.appendChild(notification);
-
-        // Remove the notification after animation
+        // Remove after delay
         setTimeout(() => {
-          notification.remove();
+          toast.style.opacity = '0';
+          toast.style.transform = 'translateY(-20px)';
+          setTimeout(() => toast.remove(), 300);
         }, 3000);
-      })();
-    `
-  });
+      },
+      args: [result.message]
+    });
+  } catch (error) {
+    console.error('Error showing notification:', error);
+  }
 }
 
 // Handle context menu clicks
@@ -129,5 +138,4 @@ browser.runtime.onMessage.addListener(async (message) => {
   if (message.action === 'clipWebsite') {
     await clipWebsite(message.url);
   }
-});
-
+});``
