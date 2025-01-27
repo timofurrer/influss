@@ -4,6 +4,29 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
+    .notification {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      padding: 12px;
+      text-align: center;
+      font-size: 14px;
+      transform: translateY(-100%);
+      transition: transform 0.3s ease;
+      z-index: 1000;
+    }
+    .notification.success {
+      background-color: #2ecc71;
+      color: white;
+    }
+    .notification.error {
+      background-color: #e74c3c;
+      color: white;
+    }
+    .notification.show {
+      transform: translateY(0);
+    }
     body {
       width: 100%;
       min-width: 280px;
@@ -39,6 +62,7 @@
   </style>
 </head>
 <body>
+  <div id="notification" class="notification"></div>
   <button id="clip-button">Read it later with Influss</button>
   <a href="#" id="settings-link" class="settings-link">Settings</a>
   <script src="popup.js"></script>

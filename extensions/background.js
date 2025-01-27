@@ -32,8 +32,7 @@ browser.action.onClicked.addListener(async (tab) => {
 
 async function clipWebsite(url) {
   if (!endpoint) {
-    console.error('Endpoint not configured');
-    return;
+    return { success: false, message: 'Please configure the endpoint in settings first.' };
   }
 
   try {
@@ -47,22 +46,81 @@ async function clipWebsite(url) {
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      throw new Error(`Failed to clip website (${response.status})`);
     }
 
-    // Android doesn't support notifications API, so we use console.log
-    console.log('Successfully clipped website!');
+    return { success: true, message: 'Successfully clipped website!' };
   } catch (error) {
     console.error('Error clipping website:', error);
+    return { success: false, message: `Error: ${error.message}` };
   }
+}
+
+// Create a reusable notification system
+async function showToastNotification(result) {
+  // Inject CSS
+  await browser.tabs.insertCSS({
+    code: `
+      .influss-notification {
+        position: fixed;
+        top: 16px;
+        right: 16px;
+        padding: 12px 16px;
+        border-radius: 8px;
+        font-family: system-ui, -apple-system, sans-serif;
+        font-size: 14px;
+        max-width: 300px;
+        z-index: 2147483647;
+        animation: influssSlideIn 0.3s ease-out, influssSlideOut 0.3s ease-in 2.7s;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      }
+
+      .influss-notification.success {
+        background-color: #4ade80;
+        color: #052e16;
+      }
+
+      .influss-notification.error {
+        background-color: #f87171;
+        color: #450a0a;
+      }
+
+      @keyframes influssSlideIn {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+      }
+
+      @keyframes influssSlideOut {
+        from { transform: translateX(0); opacity: 1; }
+        to { transform: translateX(100%); opacity: 0; }
+      }
+    `
+  });
+
+  // Inject and remove notification
+  await browser.tabs.executeScript({
+    code: `
+      (function() {
+        const notification = document.createElement('div');
+        notification.className = 'influss-notification ' + '${result.success ? 'success' : 'error'}';
+        notification.textContent = '${result.message.replace(/'/g, "\\'")}';
+        document.body.appendChild(notification);
+
+        // Remove the notification after animation
+        setTimeout(() => {
+          notification.remove();
+        }, 3000);
+      })();
+    `
+  });
 }
 
 // Handle context menu clicks
 browser.contextMenus.onClicked.addListener(async (info, tab) => {
   if (info.menuItemId === "clip-website") {
-    // If it's a link that was right-clicked, use that URL
     const urlToClip = info.linkUrl || tab.url;
-    await clipWebsite(urlToClip);
+    const result = await clipWebsite(urlToClip);
+    await showToastNotification(result);
   }
 });
 
@@ -72,3 +130,4 @@ browser.runtime.onMessage.addListener(async (message) => {
     await clipWebsite(message.url);
   }
 });
+
