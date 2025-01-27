@@ -1,9 +1,10 @@
-package main
+package store
 
 import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log/slog"
 	"maps"
@@ -12,6 +13,8 @@ import (
 	"slices"
 	"sync"
 	"time"
+
+	"github.com/timofurrer/influss/internal/clip"
 )
 
 type FSStore struct {
@@ -43,6 +46,10 @@ type fsClip struct {
 }
 
 func NewFSStore(dir string) (*FSStore, error) {
+	if _, err := os.Stat(dir); os.IsNotExist(err) {
+		return nil, errors.New("when using the local file system store, the given store directory must already exist")
+	}
+
 	indexFile := filepath.Join(dir, "index.json")
 	data, err := os.ReadFile(indexFile)
 	if err != nil {
@@ -71,7 +78,7 @@ func (s *FSStore) CreatedAt() time.Time {
 	return s.index.CreatedAt
 }
 
-func (s *FSStore) Store(clip *Clip) error {
+func (s *FSStore) Store(clip *clip.Clip) error {
 	s.m.Lock()
 	defer s.m.Unlock()
 	fc := fsClip{
@@ -100,7 +107,7 @@ func (s *FSStore) Store(clip *Clip) error {
 	return nil
 }
 
-func (s *FSStore) Load(lastN int) []*Clip {
+func (s *FSStore) Load(lastN int) []*clip.Clip {
 	s.m.RLock()
 	s.m.RUnlock()
 	log := slog.Default()
@@ -110,7 +117,7 @@ func (s *FSStore) Load(lastN int) []*Clip {
 	})
 
 	cs = cs[:min(lastN, len(cs))]
-	clips := make([]*Clip, 0, len(cs))
+	clips := make([]*clip.Clip, 0, len(cs))
 
 	for _, cm := range cs {
 		data, err := os.ReadFile(cm.Path)
@@ -124,7 +131,7 @@ func (s *FSStore) Load(lastN int) []*Clip {
 			log.Error("Unable to unmarshal clip", slog.String("clip_hash", cm.Hash))
 		}
 
-		clips = append(clips, &Clip{
+		clips = append(clips, &clip.Clip{
 			URL:         c.URL,
 			Title:       c.Title,
 			Author:      c.Author,
@@ -137,7 +144,7 @@ func (s *FSStore) Load(lastN int) []*Clip {
 	return clips
 }
 
-func generateClipHash(clip *Clip) string {
+func generateClipHash(clip *clip.Clip) string {
 	h := sha256.New()
 	h.Write([]byte(clip.URL))
 	return hex.EncodeToString(h.Sum(nil))

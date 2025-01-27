@@ -1,44 +1,45 @@
-package main
+package feed
 
 import (
 	"fmt"
 	"time"
 
 	"github.com/gorilla/feeds"
+	"github.com/timofurrer/influss/internal/clip"
 )
 
-type feedConfig struct {
-	title       string
-	link        string
-	description string
-	authorName  string
-	authorEmail string
-	category    string
-	createdAt   time.Time
+type Config struct {
+	Title       string
+	Link        string
+	Description string
+	AuthorName  string
+	AuthorEmail string
+	Category    string
+	CreatedAt   time.Time
 }
 
-type feedBuilder struct {
+type Builder struct {
 	feed    *feeds.RssFeed
 	pubDate time.Time
 }
 
-func newFeedBuidler(cfg feedConfig) *feedBuilder {
+func NewBuidler(cfg Config) *Builder {
 	f := &feeds.RssFeed{
-		Title:          cfg.title,
-		Link:           cfg.link,
-		Description:    cfg.description,
-		ManagingEditor: fmt.Sprintf("%s (%s)", cfg.authorName, cfg.authorEmail),
-		LastBuildDate:  cfg.createdAt.Format(time.RFC1123Z),
-		Category:       cfg.category,
-		Copyright:      fmt.Sprintf("Influss and %s", cfg.authorName),
+		Title:          cfg.Title,
+		Link:           cfg.Link,
+		Description:    cfg.Description,
+		ManagingEditor: fmt.Sprintf("%s (%s)", cfg.AuthorName, cfg.AuthorEmail),
+		LastBuildDate:  cfg.CreatedAt.Format(time.RFC1123Z),
+		Category:       cfg.Category,
+		Copyright:      fmt.Sprintf("Influss and %s", cfg.AuthorName),
 	}
-	return &feedBuilder{
+	return &Builder{
 		feed:    f,
-		pubDate: cfg.createdAt,
+		pubDate: cfg.CreatedAt,
 	}
 }
 
-func (f *feedBuilder) withClip(c *Clip) {
+func (f *Builder) WithClip(c *clip.Clip) {
 	f.feed.Items = append(f.feed.Items, &feeds.RssItem{
 		Guid: &feeds.RssGuid{
 			Id:          c.URL,
@@ -59,7 +60,7 @@ func (f *feedBuilder) withClip(c *Clip) {
 	}
 }
 
-func (f *feedBuilder) toXML() ([]byte, error) {
+func (f *Builder) ToXML() ([]byte, error) {
 	f.feed.PubDate = f.pubDate.Format(time.RFC1123Z)
 	data, err := feeds.ToXML(f.feed)
 	if err != nil {
