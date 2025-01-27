@@ -14,10 +14,5 @@
   "categories": [
     "bookmarks"
   ],
-  "homepage": {
-    "en-US": {
-      "url": "https://github.com/timofurrer/influss"
-    }
-  },
   "is_experimental": true
 }
