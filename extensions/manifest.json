@@ -16,19 +16,19 @@
 
   "browser_action": {
     "default_icon": {
-      "48": "icons/clip-48.png",
-      "96": "icons/clip-96.png"
+      "48": "icons/influss-48.png",
+      "96": "icons/influss-96.png"
     },
-    "default_title": "Clip Website",
+    "default_title": "Read it later with Influss",
     "default_popup": "popup.html"
   },
 
   "page_action": {
     "default_icon": {
-      "48": "icons/clip-48.png",
-      "96": "icons/clip-96.png"
+      "48": "icons/influss-48.png",
+      "96": "icons/influss-96.png"
     },
-    "default_title": "Clip Website",
+    "default_title": "Read it later with Influss",
     "show_matches": ["<all_urls>"]
   },
 
@@ -41,7 +41,7 @@
   },
 
   "icons": {
-    "48": "icons/clip-48.png",
-    "96": "icons/clip-96.png"
+    "48": "icons/influss-48.png",
+    "96": "icons/influss-96.png"
   }
 }

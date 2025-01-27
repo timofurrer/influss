@@ -32,7 +32,7 @@ async function clipWebsite(url) {
   if (!endpoint) {
     browser.notifications.create({
       type: 'basic',
-      title: 'Website Clipper',
+      title: 'Influss Clipper',
       message: 'Please configure the endpoint in the extension settings first.'
     });
     return;
@@ -55,14 +55,14 @@ async function clipWebsite(url) {
     // Show success notification
     browser.notifications.create({
       type: 'basic',
-      title: 'Website Clipper',
+      title: 'Influss Clipper',
       message: 'Successfully clipped website!'
     });
   } catch (error) {
     console.error('Error clipping website:', error);
     browser.notifications.create({
       type: 'basic',
-      title: 'Website Clipper',
+      title: 'Influss Clipper',
       message: 'Error clipping website: ' + error.message
     });
   }
