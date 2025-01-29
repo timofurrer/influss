@@ -9,13 +9,14 @@ import (
 )
 
 type Clip struct {
-	URL         string
-	Title       string
-	Author      string
-	PublishedAt time.Time
-	ModifiedAt  time.Time
-	Excerpt     string
-	HTMLContent string
+	URL              string
+	Title            string
+	Author           string
+	PublishedAt      time.Time
+	ModifiedAt       time.Time
+	Excerpt          string
+	HTMLContent      string
+	PlainTextContent string
 }
 
 func ClipURL(url string) (*Clip, error) {
@@ -26,13 +27,14 @@ func ClipURL(url string) (*Clip, error) {
 
 	now := time.Now()
 	clip := &Clip{
-		URL:         url,
-		Title:       article.Title,
-		Author:      article.Byline,
-		PublishedAt: *cmp.Or(article.PublishedTime, &now),
-		ModifiedAt:  *cmp.Or(article.ModifiedTime, &now),
-		Excerpt:     article.Excerpt,
-		HTMLContent: article.Content,
+		URL:              url,
+		Title:            article.Title,
+		Author:           article.Byline,
+		PublishedAt:      *cmp.Or(article.PublishedTime, &now),
+		ModifiedAt:       *cmp.Or(article.ModifiedTime, &now),
+		Excerpt:          article.Excerpt,
+		HTMLContent:      article.Content,
+		PlainTextContent: article.TextContent,
 	}
 
 	return clip, nil

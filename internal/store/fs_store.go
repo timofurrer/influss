@@ -102,18 +102,30 @@ func (s *FSStore) Store(clip *clip.Clip) error {
 		Timestamp: time.Now(),
 	}
 
-	writeJSON(fc, cm.Path)
+	// write clip file
+	err := writeJSON(fc, cm.Path)
+	if err != nil {
+		return fmt.Errorf("failed to store clip: %w", err)
+	}
+	// write plain text content file for better shell-friendliness
+	err = os.WriteFile(filepath.Join(s.dir, fmt.Sprintf("%s.txt", h)), []byte(clip.PlainTextContent), 0644)
+	if err != nil {
+		return fmt.Errorf("failed to store clip plain text data: %w", err)
+	}
 
 	s.index.LastUpdatedAt = cm.Timestamp
 	s.index.Clips[h] = cm
 
-	writeJSON(s.index, filepath.Join(s.dir, "index.json"))
+	err = writeJSON(s.index, filepath.Join(s.dir, "index.json"))
+	if err != nil {
+		return fmt.Errorf("failed to store index file after updating clip %s: %w", h, err)
+	}
 	return nil
 }
 
 func (s *FSStore) Load(lastN int) []*clip.Clip {
 	s.m.RLock()
-	s.m.RUnlock()
+	defer s.m.RUnlock()
 	log := slog.Default()
 	cs := slices.Collect(maps.Values(s.index.Clips))
 	slices.SortFunc(cs, func(a, b clipMeta) int {
@@ -143,6 +155,8 @@ func (s *FSStore) Load(lastN int) []*clip.Clip {
 			ModifiedAt:  c.ModifiedAt,
 			Excerpt:     c.Excerpt,
 			HTMLContent: c.HTMLContent,
+			// NOTE: no need to load the plain text content file
+			PlainTextContent: "",
 		})
 	}
 	return clips
