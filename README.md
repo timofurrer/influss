@@ -53,6 +53,13 @@ influss.<your domain> {
 Use [`caddy hash-password`](https://caddyserver.com/docs/command-line#caddy-hash-password)
 to hash the password for the `Caddyfile` configuration.
 
+## Configure RSS reader
+
+Configure your RSS reader to point to `influss.<your domain>/clips` and optionally
+use the HTTP basic auth credentials.
+
+We recommend [miniflux](https://miniflux.app/) as the RSS reader.
+
 ## Install browser extension
 
 influss currently only provides a Firefox Add-on.
