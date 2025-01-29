@@ -49,9 +49,9 @@ func ClipURLFunc(log *slog.Logger, store store.Store) http.HandlerFunc {
 	}
 }
 
-func GetFeedFunc(config feed.Config, store store.Store) http.HandlerFunc {
+func GetFeedFunc(config feed.Config, itemsLimit int, store store.Store) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		clips := store.Load(20)
+		clips := store.Load(itemsLimit)
 
 		fb := feed.NewBuidler(config)
 		for _, c := range clips {

@@ -17,6 +17,10 @@ import (
 	"github.com/timofurrer/influss/internal/clip"
 )
 
+var (
+	_ Store = (*FSStore)(nil)
+)
+
 type FSStore struct {
 	dir   string
 	index *index

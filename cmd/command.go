@@ -20,6 +20,7 @@ type cmdConfig struct {
 	feedAuthorName  string
 	feedAuthorEmail string
 	feedCategory    string
+	feedItemsLimit  int64
 }
 
 type Cmd struct {
@@ -43,6 +44,8 @@ func (c *Cmd) Parse() {
 	flag.StringVar(&c.config.feedAuthorName, "feed-author-name", "", "the RSS feed author name (your name probably)")
 	flag.StringVar(&c.config.feedAuthorEmail, "feed-author-email", "", "the RSS feed author email (your email probably)")
 	flag.StringVar(&c.config.feedCategory, "feed-category", "Read It Later", "the RSS feed category")
+
+	flag.Int64Var(&c.config.feedItemsLimit, "feed-items-limit", 20, "the number of feed items to put in the RSS feed")
 
 	flag.Parse()
 }
@@ -74,7 +77,7 @@ func (c *Cmd) Run() {
 
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("GET /clips", api.GetFeedFunc(feedConfig, s))
+	mux.HandleFunc("GET /clips", api.GetFeedFunc(feedConfig, int(c.config.feedItemsLimit), s))
 	mux.HandleFunc("POST /clips", api.ClipURLFunc(c.log, s))
 
 	c.log.Info("Serving ...", slog.String("listen_addr", c.config.listenAddr))
