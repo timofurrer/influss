@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Influss Clipper",
+  "name": "influss clipper",
   "version": "1.0.0",
   "description": "Minimalist website clipper to be consumed by your favorite RSS reader.",
   "permissions": [
@@ -23,7 +23,7 @@
       "48": "icons/influss-48.png",
       "96": "icons/influss-96.png"
     },
-    "default_title": "Read it later with Influss",
+    "default_title": "Read it later with influss",
     "default_popup": "popup.html"
   },
 

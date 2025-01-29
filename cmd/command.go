@@ -38,9 +38,9 @@ func (c *Cmd) Parse() {
 	flag.BoolVar(&c.config.useLocalStore, "use-local-store", true, "enable local file system store")
 	flag.StringVar(&c.config.localStoreDir, "local-store-dir", "store", "the path to the local store root directory")
 
-	flag.StringVar(&c.config.feedTitle, "feed-title", "Influss", "the RSS feed title")
+	flag.StringVar(&c.config.feedTitle, "feed-title", "influss", "the RSS feed title")
 	flag.StringVar(&c.config.feedLink, "feed-link", "", "the external URL to the RSS feed")
-	flag.StringVar(&c.config.feedDescription, "feed-description", "Influss Feed", "the description of the RSS feed")
+	flag.StringVar(&c.config.feedDescription, "feed-description", "influss RSS feed", "the description of the RSS feed")
 	flag.StringVar(&c.config.feedAuthorName, "feed-author-name", "", "the RSS feed author name (your name probably)")
 	flag.StringVar(&c.config.feedAuthorEmail, "feed-author-email", "", "the RSS feed author email (your email probably)")
 	flag.StringVar(&c.config.feedCategory, "feed-category", "Read It Later", "the RSS feed category")

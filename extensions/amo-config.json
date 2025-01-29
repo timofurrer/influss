@@ -1,15 +1,15 @@
 {
   "name": {
-    "en-US": "Influss Clipper"
+    "en-US": "influss Clipper"
   },
   "version": {
     "license": "MIT"
   },
   "summary": {
-    "en-US": "Minimalist website clipper to be consumed by your favorite RSS reader. It provides a context-menu entry to send the website URL to your Influss instance."
+    "en-US": "Minimalist website clipper to be consumed by your favorite RSS reader. It provides a context-menu entry to send the website URL to your influss instance."
   },
   "description": {
-    "en-US": "Minimalist website clipper to be consumed by your favorite RSS reader. It provides a few means to clip a website and send it to your Influss instance. It will provide a context-menu entry as well as a page action item. The Influss endpoint, username and password can be configured in the extensions settings."
+    "en-US": "Minimalist website clipper to be consumed by your favorite RSS reader. It provides a few means to clip a website and send it to your influss instance. It will provide a context-menu entry as well as a page action item. The influss endpoint, username and password can be configured in the extensions settings."
   },
   "categories": [
     "bookmarks"

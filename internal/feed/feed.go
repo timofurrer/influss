@@ -31,7 +31,7 @@ func NewBuidler(cfg Config) *Builder {
 		ManagingEditor: fmt.Sprintf("%s (%s)", cfg.AuthorName, cfg.AuthorEmail),
 		LastBuildDate:  cfg.CreatedAt.Format(time.RFC1123Z),
 		Category:       cfg.Category,
-		Copyright:      fmt.Sprintf("Influss and %s", cfg.AuthorName),
+		Copyright:      fmt.Sprintf("influss and %s", cfg.AuthorName),
 	}
 	return &Builder{
 		feed:    f,

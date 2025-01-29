@@ -21,7 +21,7 @@ browser.storage.onChanged.addListener((changes, area) => {
 // Create context menu item
 browser.contextMenus.create({
   id: "clip-website",
-  title: "Read it later with Influss",
+  title: "Read it later with influss",
   contexts: ["page", "link"]
 });
 
