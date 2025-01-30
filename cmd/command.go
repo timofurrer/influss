@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"errors"
 	"flag"
 	"log/slog"
 	"net/http"
@@ -11,16 +12,18 @@ import (
 )
 
 type cmdConfig struct {
-	listenAddr      string
-	useLocalStore   bool
-	localStoreDir   string
-	feedTitle       string
-	feedLink        string
-	feedDescription string
-	feedAuthorName  string
-	feedAuthorEmail string
-	feedCategory    string
-	feedItemsLimit  int64
+	listenAddr          string
+	useLocalStore       bool
+	localStoreDir       string
+	useSqlStore         bool
+	sqlConnectionString string
+	feedTitle           string
+	feedLink            string
+	feedDescription     string
+	feedAuthorName      string
+	feedAuthorEmail     string
+	feedCategory        string
+	feedItemsLimit      int64
 }
 
 type Cmd struct {
@@ -32,11 +35,14 @@ func NewCommand(log *slog.Logger) *Cmd {
 	return &Cmd{log: log}
 }
 
-func (c *Cmd) Parse() {
+func (c *Cmd) Parse() error {
 	flag.StringVar(&c.config.listenAddr, "listen-addr", ":8080", "the address to listen on")
 
-	flag.BoolVar(&c.config.useLocalStore, "use-local-store", true, "enable local file system store")
+	flag.BoolVar(&c.config.useLocalStore, "use-local-store", false, "enable local file system store")
 	flag.StringVar(&c.config.localStoreDir, "local-store-dir", "store", "the path to the local store root directory")
+
+	flag.BoolVar(&c.config.useSqlStore, "use-sql-store", false, "enable SQL store")
+	flag.StringVar(&c.config.sqlConnectionString, "sql-connection-string", "", "the SQL connection string for the SQL store")
 
 	flag.StringVar(&c.config.feedTitle, "feed-title", "influss", "the RSS feed title")
 	flag.StringVar(&c.config.feedLink, "feed-link", "", "the external URL to the RSS feed")
@@ -48,20 +54,40 @@ func (c *Cmd) Parse() {
 	flag.Int64Var(&c.config.feedItemsLimit, "feed-items-limit", 20, "the number of feed items to put in the RSS feed")
 
 	flag.Parse()
+
+	if !c.config.useLocalStore && !c.config.useSqlStore {
+		return errors.New("choose between using a local store or sql store")
+	}
+
+	if c.config.useLocalStore && c.config.useSqlStore {
+		return errors.New("choose between using a local store or sql store, but not both")
+	}
+
+	if c.config.useSqlStore && c.config.sqlConnectionString == "" {
+		return errors.New("when using the sql store a connection string is required")
+	}
+
+	if c.config.useLocalStore && c.config.sqlConnectionString != "" {
+		return errors.New("when using the local store the connection string is ignored, don't specify it")
+	}
+
+	return nil
 }
 
 func (c *Cmd) Run() {
 	var s store.Store
+	var err error
 	switch {
 	case c.config.useLocalStore:
-		var err error
 		s, err = store.NewFSStore(c.config.localStoreDir)
-		if err != nil {
-			c.log.Error("failed to create store", slog.String("error", err.Error()))
-			return
-		}
+	case c.config.useSqlStore:
+		s, err = store.NewSqlStore(c.log, c.config.sqlConnectionString)
 	default:
 		c.log.Error("No store provider chosen")
+		return
+	}
+	if err != nil {
+		c.log.Error("failed to create store", slog.String("error", err.Error()))
 		return
 	}
 

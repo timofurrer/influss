@@ -14,6 +14,10 @@ func main() {
 	slog.SetDefault(log)
 
 	cmd := cmd.NewCommand(log)
-	cmd.Parse()
+	err := cmd.Parse()
+	if err != nil {
+		log.Error("failed to parse command line", slog.Any("error", err))
+		return
+	}
 	cmd.Run()
 }

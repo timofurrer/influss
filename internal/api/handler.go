@@ -43,6 +43,7 @@ func ClipURLFunc(log *slog.Logger, store store.Store) http.HandlerFunc {
 		err = store.Store(clip)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("Error storing clipped URL: %s", err), http.StatusInternalServerError)
+			return
 		}
 
 		w.WriteHeader(http.StatusCreated)
