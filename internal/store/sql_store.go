@@ -69,11 +69,7 @@ func (s *SqlStore) CreatedAt() time.Time {
 	return parseTime(createdAt)
 }
 
-func (s *SqlStore) Load(lastN int) []*clip.Clip {
-	// Create context with timeout
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-
+func (s *SqlStore) Load(ctx context.Context, lastN int) []*clip.Clip {
 	query := `
 		SELECT
 			url, title, author,
@@ -124,10 +120,7 @@ func (s *SqlStore) Load(lastN int) []*clip.Clip {
 	return clips
 }
 
-func (s *SqlStore) Store(clip *clip.Clip) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-
+func (s *SqlStore) Store(ctx context.Context, clip *clip.Clip) error {
 	query := `
 		INSERT INTO clip (
 			url, title, author,

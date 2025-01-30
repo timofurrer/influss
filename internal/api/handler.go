@@ -40,7 +40,7 @@ func ClipURLFunc(log *slog.Logger, store store.Store) http.HandlerFunc {
 			return
 		}
 
-		err = store.Store(clip)
+		err = store.Store(r.Context(), clip)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("Error storing clipped URL: %s", err), http.StatusInternalServerError)
 			return
@@ -52,7 +52,7 @@ func ClipURLFunc(log *slog.Logger, store store.Store) http.HandlerFunc {
 
 func GetFeedFunc(config feed.Config, itemsLimit int, store store.Store) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		clips := store.Load(itemsLimit)
+		clips := store.Load(r.Context(), itemsLimit)
 
 		fb := feed.NewBuidler(config)
 		for _, c := range clips {

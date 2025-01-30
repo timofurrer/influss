@@ -1,6 +1,7 @@
 package store
 
 import (
+	"context"
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
@@ -82,7 +83,7 @@ func (s *FSStore) CreatedAt() time.Time {
 	return s.index.CreatedAt
 }
 
-func (s *FSStore) Store(clip *clip.Clip) error {
+func (s *FSStore) Store(_ context.Context, clip *clip.Clip) error {
 	s.m.Lock()
 	defer s.m.Unlock()
 	fc := fsClip{
@@ -123,7 +124,7 @@ func (s *FSStore) Store(clip *clip.Clip) error {
 	return nil
 }
 
-func (s *FSStore) Load(lastN int) []*clip.Clip {
+func (s *FSStore) Load(_ context.Context, lastN int) []*clip.Clip {
 	s.m.RLock()
 	defer s.m.RUnlock()
 	log := slog.Default()
