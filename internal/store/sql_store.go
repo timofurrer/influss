@@ -18,8 +18,14 @@ var (
 	_ Store = (*SqlStore)(nil)
 )
 
+const (
+	sqlite3DriverName  = "sqlite3"
+	postgresDriverName = "postgres"
+)
+
 type SqlStore struct {
-	db *sql.DB
+	driver string
+	db     *sql.DB
 }
 
 func NewSqlStore(log *slog.Logger, connectionString string) (*SqlStore, error) {
@@ -30,11 +36,11 @@ func NewSqlStore(log *slog.Logger, connectionString string) (*SqlStore, error) {
 
 	var driver, dsn string
 	switch u.Scheme {
-	case "sqlite3":
-		driver = "sqlite3"
+	case sqlite3DriverName:
+		driver = sqlite3DriverName
 		dsn = u.Host
-	case "postgres":
-		driver = "postgres"
+	case postgresDriverName:
+		driver = postgresDriverName
 		dsn = connectionString
 	default:
 		return nil, fmt.Errorf("sql connection string must either have sqlite3:// or postgres:// scheme")
@@ -50,7 +56,7 @@ func NewSqlStore(log *slog.Logger, connectionString string) (*SqlStore, error) {
 		return nil, fmt.Errorf("failed to run migrations: %w", err)
 	}
 
-	return &SqlStore{db: db}, nil
+	return &SqlStore{driver: driver, db: db}, nil
 }
 
 func (s *SqlStore) CreatedAt() time.Time {
@@ -66,7 +72,7 @@ func (s *SqlStore) CreatedAt() time.Time {
 		return time.Time{}
 	}
 
-	return parseTime(createdAt)
+	return s.parseTime(createdAt)
 }
 
 func (s *SqlStore) Load(ctx context.Context, lastN int) []*clip.Clip {
@@ -106,8 +112,8 @@ func (s *SqlStore) Load(ctx context.Context, lastN int) []*clip.Clip {
 		}
 
 		// Parse the timestamps
-		c.PublishedAt = parseTime(publishedAt)
-		c.ModifiedAt = parseTime(modifiedAt)
+		c.PublishedAt = s.parseTime(publishedAt)
+		c.ModifiedAt = s.parseTime(modifiedAt)
 
 		clips = append(clips, c)
 	}
@@ -153,12 +159,15 @@ func (s *SqlStore) Store(ctx context.Context, clip *clip.Clip) error {
 	return err
 }
 
-func parseTime(s sql.NullString) time.Time {
-	if s.Valid {
-		t, err := time.Parse("2006-01-02 15:04:05.999999999-07:00", s.String)
-		if err == nil {
-			return t
+func (s *SqlStore) parseTime(ns sql.NullString) time.Time {
+	var t time.Time
+	if ns.Valid {
+		switch s.driver {
+		case sqlite3DriverName:
+			t, _ = time.Parse("2006-01-02 15:04:05.999999999-07:00", ns.String)
+		case postgresDriverName:
+			t, _ = time.Parse(time.RFC3339, ns.String)
 		}
 	}
-	return time.Time{}
+	return t
 }
