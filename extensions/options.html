@@ -1,24 +1,124 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Read It Later Options</title>
+  <title>influss settings</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #f5f5f5;
+    }
+
+    .container {
+      background: white;
+      padding: 24px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+      color: #2d2d2d;
+      font-size: 24px;
+      margin-bottom: 24px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: #4a4a4a;
+      font-weight: 500;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #e0e0e0;
+      border-radius: 6px;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #0060df;
+    }
+
+    button {
+      background-color: #0060df;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      width: 100%;
+      font-weight: 500;
+    }
+
+    button:hover {
+      background-color: #003eaa;
+    }
+
+    .save-message {
+      display: none;
+      text-align: center;
+      margin-top: 16px;
+      padding: 12px;
+      border-radius: 6px;
+      background-color: #e6ffe8;
+      color: #1a7f1c;
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 16px;
+      }
+
+      .container {
+        padding: 16px;
+      }
+
+      input {
+        font-size: 16px; /* Prevents zoom on iOS */
+      }
+    }
+  </style>
 </head>
 <body>
-  <form id="options-form">
-    <div>
-      <label for="endpoint">API Endpoint:</label>
-      <input type="url" id="endpoint" required>
-    </div>
-    <div>
-      <label for="username">Username:</label>
-      <input type="text" id="username" required>
-    </div>
-    <div>
-      <label for="password">Password:</label>
-      <input type="password" id="password" required>
-    </div>
-    <button type="submit">Save</button>
-  </form>
+  <div class="container">
+    <h1>influss settings</h1>
+    <form id="options-form">
+      <div class="form-group">
+        <label for="endpoint">API Endpoint</label>
+        <input type="url" id="endpoint"
+               placeholder="https://your-influss.example.com/clips"
+               required>
+      </div>
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input type="text" id="username"
+               placeholder="Enter your username"
+               required>
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password"
+               placeholder="Enter your password"
+               required>
+      </div>
+      <button type="submit">Save Settings</button>
+      <div id="save-message" class="save-message">
+        Settings saved successfully!
+      </div>
+    </form>
+  </div>
   <script src="options.js"></script>
 </body>
 </html>

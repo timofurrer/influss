@@ -10,8 +10,15 @@ document.getElementById('options-form').addEventListener('submit', (e) => {
     username: username,
     password: password
   }).then(() => {
-    alert('Options saved!');
+    const saveMessage = document.getElementById('save-message');
+    saveMessage.style.display = 'block';
+
+    // Hide the message after 3 seconds
+    setTimeout(() => {
+      saveMessage.style.display = 'none';
+    }, 3000);
   });
+});
 });
 
 // Load saved options

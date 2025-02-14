@@ -7,7 +7,8 @@
   "permissions": [
     "storage",
     "activeTab",
-    "contextMenus"
+    "contextMenus",
+    "notifications"
   ],
 
   "host_permissions": [
@@ -26,7 +27,7 @@
       "48": "icons/influss-48.png",
       "96": "icons/influss-96.png"
     },
-    "default_title": "Read it later with influss"
+    "default_title": "Read it later (influss)"
   },
 
   "background": {

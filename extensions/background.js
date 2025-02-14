@@ -6,15 +6,15 @@ browser.action.onClicked.addListener((tab) => {
 browser.runtime.onInstalled.addListener(() => {
   // Create context menu item
   browser.contextMenus.create({
-    id: "read-it-later",
-    title: "Read it later",
+    id: "read-it-later-influss",
+    title: "Read it later (influss)",
     contexts: ["page", "link"]
   });
 });
 
 // Handle context menu clicks
 browser.contextMenus.onClicked.addListener((info, tab) => {
-  if (info.menuItemId === "read-it-later") {
+  if (info.menuItemId === "read-it-later-influss") {
     saveForLater(info.linkUrl || tab.url);
   }
 });
@@ -41,8 +41,6 @@ async function saveForLater(url) {
       return;
     }
 
-    // Make the HTTP POST request
-    // Create Basic Auth header
     const authHeader = 'Basic ' + btoa(`${username}:${password}`);
 
     const response = await fetch(endpoint, {
@@ -51,10 +49,7 @@ async function saveForLater(url) {
         'Content-Type': 'application/json',
         'Authorization': authHeader
       },
-      body: JSON.stringify({
-        url: url,
-        timestamp: new Date().toISOString()
-      })
+      body: JSON.stringify({url: url})
     });
 
     if (!response.ok) {
