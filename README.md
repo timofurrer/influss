@@ -63,7 +63,8 @@ We recommend [miniflux](https://miniflux.app/) as the RSS reader.
 ## Install browser extension
 
 influss currently only provides a Firefox Add-on.
-It's still in review by Mozilla as of writing this.
+
+The extension page is [here](https://addons.mozilla.org/de/android/addon/9ed557601ec54aaeb32f)
 
 However, you may already install the add-on from the [`extensions`](./extensions)
 directory.
