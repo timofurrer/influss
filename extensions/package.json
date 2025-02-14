@@ -9,7 +9,8 @@
     "start": "web-ext run",
     "lint": "web-ext lint",
     "sign": "web-ext sign",
-    "watch": "web-ext run --watch-files"
+    "watch": "web-ext run --watch-files",
+    "debug": "web-ext run -t firefox-android --adb-device 3C191JEKB16737 --firefox-apk org.mozilla.fenix"
   },
   "devDependencies": {
     "web-ext": "^8.3.0"

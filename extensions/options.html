@@ -1,59 +1,23 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body {
-      padding: 16px;
-      font-family: system-ui, -apple-system, sans-serif;
-      max-width: 100%;
-      margin: 0 auto;
-      box-sizing: border-box;
-    }
-    label {
-      display: block;
-      margin: 16px 0 8px;
-      font-weight: 500;
-      font-size: 16px;
-    }
-    input {
-      width: 100%;
-      padding: 12px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      font-size: 16px;
-      box-sizing: border-box;
-    }
-    button {
-      width: 100%;
-      padding: 16px;
-      margin: 24px 0;
-      border: none;
-      border-radius: 8px;
-      background: #0060df;
-      color: white;
-      font-size: 16px;
-      cursor: pointer;
-      touch-action: manipulation;
-    }
-    button:active {
-      background: #003eaa;
-    }
-  </style>
+  <title>Read It Later Options</title>
 </head>
 <body>
   <form id="options-form">
-    <label for="endpoint">Endpoint URL:</label>
-    <input type="url" id="endpoint" required>
-
-    <label for="username">Username:</label>
-    <input type="text" id="username">
-
-    <label for="password">Password:</label>
-    <input type="password" id="password">
-
-    <button type="submit">Save Settings</button>
+    <div>
+      <label for="endpoint">API Endpoint:</label>
+      <input type="url" id="endpoint" required>
+    </div>
+    <div>
+      <label for="username">Username:</label>
+      <input type="text" id="username" required>
+    </div>
+    <div>
+      <label for="password">Password:</label>
+      <input type="password" id="password" required>
+    </div>
+    <button type="submit">Save</button>
   </form>
   <script src="options.js"></script>
 </body>

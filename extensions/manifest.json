@@ -3,15 +3,17 @@
   "name": "influss clipper",
   "version": "1.0.0",
   "description": "Minimalist website clipper to be consumed by your favorite RSS reader.",
+
   "permissions": [
     "storage",
     "activeTab",
-    "contextMenus",
-    "scripting"
+    "contextMenus"
   ],
+
   "host_permissions": [
     "<all_urls>"
   ],
+
   "browser_specific_settings": {
     "gecko": {
       "id": "{f2313271-d6ed-4843-8157-00b56c01f40a}"
@@ -24,18 +26,15 @@
       "48": "icons/influss-48.png",
       "96": "icons/influss-96.png"
     },
-    "default_title": "Read it later with influss",
-    "default_popup": "popup.html"
+    "default_title": "Read it later with influss"
   },
 
   "background": {
-    "scripts": ["background.js"],
-    "type": "module"
+    "scripts": ["background.js"]
   },
 
   "options_ui": {
-    "page": "options.html",
-    "mobile_only": false
+    "page": "options.html"
   },
 
   "icons": {
