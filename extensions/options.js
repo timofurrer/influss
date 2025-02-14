@@ -19,7 +19,6 @@ document.getElementById('options-form').addEventListener('submit', (e) => {
     }, 3000);
   });
 });
-});
 
 // Load saved options
 browser.storage.sync.get(['endpoint', 'username', 'password']).then((result) => {
